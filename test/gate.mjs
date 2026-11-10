@@ -325,7 +325,10 @@ console.log("\n== tool-gate ==");
   }
   {
     const h = makeCtx("allowed-once");
-    installToolGate(h.ctx, { auditPath: () => path.join("Z:\\nope\\nested", "audit.jsonl"), fs, path });
+    const unwritableAudit = process.platform === "win32"
+      ? path.join("Z:\\nope\\nested", "audit.jsonl")
+      : "/dev/null/audit.jsonl";
+    installToolGate(h.ctx, { auditPath: () => unwritableAudit, fs, path });
     const out = await h.handlers["tools/post-execute"][0]({ name: "purge_apply" }, { value: {} }, async () => "next");
     check("unwritable audit path does not break result", out === "next");
   }

@@ -1,4 +1,4 @@
-window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
+window.__ModuleLoader__.load({ id: "dsh-purge-plus", factory: (require) => {
 
 		var module = { exports: {} };
 		var exports = module.exports;
@@ -7,9 +7,9 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 		const h = react.createElement;
 		const { useState, useEffect, useCallback, useRef, Component } = react;
 
-		const name = "dsh-purge";
+		const name = "dsh-purge-plus";
 		const inject = ["slots", "locale"];
-		const NS = "settings.dsh-purge";
+		const NS = "settings.dsh-purge-plus";
 		let translate = (key) => key;
 		function useT() {
 			return translate;
@@ -129,7 +129,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			nav: "规则设定",
 			"page.title": "DeepSeek Harness Purge",
 			"page.nav": "Purge",
-			"page.lead": "本机提示词与引擎层清洗。改完点「应用」，重启宿主后生效。",
+			"page.lead": "破甲、提示词与工具设置。",
 			"page.seg.armor": "破甲",
 			"page.seg.rules": "规则",
 			"page.seg.skills": "技能",
@@ -140,9 +140,9 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"drill.unavailable": "演练台资源未随插件加载，重装或重启后可恢复。",
 			"dock.clean": "清洗",
 			"dock.drill": "演练台",
-			"dock.toggle": "dsh-purge",
-			"dock.newSession": "dsh-purge",
-			"dock.inSession": "dsh-purge",
+			"dock.toggle": "dsh-purge-plus",
+			"dock.newSession": "dsh-purge-plus",
+			"dock.inSession": "dsh-purge-plus",
 			"dock.redteam": "红队模式",
 			"dock.full": "全面浏览",
 			"dock.close": "收起",
@@ -151,8 +151,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"welcome.title": "用户须知",
 			"welcome.lead": "首次安装本插件时请阅读以下说明。确认后本窗不再弹出。",
 			"welcome.warn": "本插件免费开源。任何背着作者私自售卖、付费倒卖或借本项目盈利的行为，作者将依法追究法律责任。",
-			"welcome.body": "dsh-purge 是 DeepSeek Harness 的本机网络安全红队评测与清洗插件：在受控本机环境中调整提示词与补丁、做授权范围内的演练台操作。项目免费、非营利，源码仓库：",
-			"welcome.repo": "https://github.com/YuJunZhiXue/dsh-purge",
+			"welcome.body": "dsh-purge-plus 是 DeepSeek Harness 的本机网络安全红队评测与清洗插件：在受控本机环境中调整提示词与补丁、做授权范围内的演练台操作。项目免费、非营利，源码仓库：",
+			"welcome.repo": "https://github.com/weimin96/dsh-purge-plus",
 			"welcome.ban1": "禁止将本项目用于未授权的网络攻击、入侵、窃取数据、破坏系统或任何违法犯罪。",
 			"welcome.ban2": "禁止商业售卖、付费倒卖、黑灰产牟利，以及隐瞒作者的营利性再分发。",
 			"welcome.ban3": "使用者须自行遵守所在地法律法规与平台规范；违法后果由行为人自行承担，与作者无关。",
@@ -184,12 +184,13 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"theme.aria": "外观",
 			"theme.white": "白",
 			"theme.ink": "墨",
-			"purge.title": "补丁",
-			"purge.lead": "本机 0.2.1 的 82 个锚点：已应用 / 总数、命令 shim、备份状态。检测到待处理项时点应用。",
+			"purge.title": "运行状态",
+			"advanced.title": "高级设置",
+			"purge.lead": "本机补丁表：已应用 / 总数、命令 shim、备份状态。检测到待处理项时点应用。",
 			"override.title": "提示词",
-			"override.lead": "注入到 system 段的操作员指令。改成自己的稿子会按原样落盘，不再随插件刷新。",
+			"override.lead": "注入到对话的系统提示词。",
 			"own.title": "自己的服务器",
-			"own.hint": "每行一个 IP 或完整主机名。可以写成 账号@主机，账号只用来认出这种写法。主机名会连同它当时解析出的地址一起放行。不要写密钥、密码、网段。",
+			"own.hint": "每行一个 IP 或主机名。",
 			"own.save": "保存名单",
 			"saved.own": "已保存自己的服务器",
 			"saved.own.dropped": "已保存。有 {n} 行不是单个 IP 或主机名，已丢掉",
@@ -238,6 +239,49 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"uninstall.fail": "卸载失败: {error}",
 			"btn.checkUpdate": "检测更新",
 			"btn.checkUpdate.busy": "检测中…",
+			"selfcheck.button": "自检",
+			"selfcheck.running": "自检中…",
+			"selfcheck.title": "逐层自检",
+			"maintenance.backup": "创建快照",
+			"maintenance.busy": "快照中…",
+			"maintenance.count": "已有 {n} 份快照，共 {mb} MB",
+			"features.title": "运行功能",
+			"features.hint": "上方三个模式是快捷预设；下方子项可以单独微调。提示词注入 / 能力协议 / 自动续跑会明显影响上下文与回答风格；宿主补丁不在此处，仍按「应用」状态生效。",
+			"features.all": "全部开启",
+			"features.smart": "轻量模式",
+			"features.none": "全部关闭（运行时）",
+			"features.mode.all": "全部开启",
+			"features.mode.smart": "轻量模式",
+			"features.mode.none": "全部关闭",
+			"features.mode.custom": "自定义",
+			"features.current": "当前模式：{mode}",
+			"features.desc.all": "所有运行时功能开启。",
+			"features.desc.smart": "保留主提示词注入和请求异常自动重试；关闭能力协议、自动续跑、推脱重试和红队工具。",
+			"features.desc.none": "所有运行时功能关闭；宿主补丁仍需单独「还原」。",
+			"features.desc.custom": "当前是自定义组合，按下面的勾选项生效。",
+			"features.saved": "已保存",
+			"features.restartRequired": "修改已保存，需重启宿主后生效。",
+			"features.master": "总开关",
+			"features.promptInject": "提示词注入",
+			"features.capabilityProtocol": "能力协议",
+			"features.autoRetry": "自动重试",
+			"features.autoContinue": "自动续跑",
+			"features.refusalRetry": "推脱重试",
+			"features.redteamTools": "红队工具",
+			"features.hostPatches": "宿主补丁",
+			"patch.status.none": "未应用",
+			"patch.status.partial": "部分应用",
+			"patch.status.done": "已应用",
+			"patch.status.loading": "加载中",
+			"patch.status.missing": "未找到宿主",
+			"patch.apply": "应用补丁",
+			"patch.applyRemaining": "应用剩余 {n} 条",
+			"patch.revert": "还原补丁",
+			"patch.appliedCount": "已应用 {a} / {t}",
+			"patch.pendingCount": "待处理 {n}",
+			"patch.skippedCount": "跳过 {n}",
+			"features.allFeatures": "全部功能",
+			"features.masterOff": "全部关闭（运行时）已生效，以下子开关的实际生效值均为关闭。",
 			"btn.doUpdate": "更新",
 			"btn.doUpdate.busy": "更新中…",
 			"channel.title": "通道",
@@ -495,7 +539,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			nav: "Rules",
 			"page.title": "DeepSeek Harness Purge",
 			"page.nav": "Purge",
-			"page.lead": "Prompt and engine-level cleaning for this install. Press Apply, then restart the host.",
+			"page.lead": "Jailbreak, prompt and tool settings.",
 			"page.seg.armor": "Armor",
 			"page.seg.rules": "Rules",
 			"page.seg.skills": "Skills",
@@ -506,9 +550,9 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"drill.unavailable": "Drill resources are not loaded; reinstall or restart to restore them.",
 			"dock.clean": "Clean",
 			"dock.drill": "Drill",
-			"dock.toggle": "dsh-purge",
-			"dock.newSession": "dsh-purge",
-			"dock.inSession": "dsh-purge",
+			"dock.toggle": "dsh-purge-plus",
+			"dock.newSession": "dsh-purge-plus",
+			"dock.inSession": "dsh-purge-plus",
 			"dock.redteam": "Red team",
 			"dock.full": "Full view",
 			"dock.close": "Collapse",
@@ -517,8 +561,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"welcome.title": "User notice",
 			"welcome.lead": "Please read this on first install. After you confirm, it will not appear again.",
 			"welcome.warn": "This plugin is free and open source. Anyone who sells, resells, or profits from it behind the author's back may face legal action.",
-			"welcome.body": "dsh-purge is a local DeepSeek Harness plugin for security evaluation and cleaning: adjust prompts and patches on a machine you control, and use the drill console only within authorized scope. It is free and non-profit. Repository:",
-			"welcome.repo": "https://github.com/YuJunZhiXue/dsh-purge",
+			"welcome.body": "dsh-purge-plus is a local DeepSeek Harness plugin for security evaluation and cleaning: adjust prompts and patches on a machine you control, and use the drill console only within authorized scope. It is free and non-profit. Repository:",
+			"welcome.repo": "https://github.com/weimin96/dsh-purge-plus",
 			"welcome.ban1": "Do not use this project for unauthorized attacks, intrusion, data theft, sabotage, or any illegal activity.",
 			"welcome.ban2": "Do not commercially sell, resell, or profit from gray-market use, or redistribute for profit without the author.",
 			"welcome.ban3": "You must follow local law and platform rules; illegal use is solely your responsibility.",
@@ -550,12 +594,13 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"theme.aria": "Appearance",
 			"theme.white": "Light",
 			"theme.ink": "Ink",
-			"purge.title": "Patches",
-			"purge.lead": "82 anchors on this 0.2.1 install: applied / total, command shims, backup state. Press Apply when anything is pending.",
+			"purge.title": "Status",
+			"advanced.title": "Advanced",
+			"purge.lead": "Patch table on this install: applied / total, command shims, backup state. Press Apply when anything is pending.",
 			"override.title": "Prompt",
-			"override.lead": "Operator instructions injected into the system section. Your own text is written verbatim and stops following plugin updates.",
+			"override.lead": "System prompt injected into the conversation.",
 			"own.title": "Own servers",
-			"own.hint": "One IP or exact hostname per line. account@host is accepted; the account only identifies that host. A hostname also allows the addresses it resolves to. Do not enter a key, a password, or a range.",
+			"own.hint": "One IP or hostname per line.",
 			"own.save": "Save list",
 			"saved.own": "Own servers saved",
 			"saved.own.dropped": "Saved. {n} lines were not a single IP or hostname and were dropped",
@@ -604,6 +649,49 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"uninstall.fail": "Uninstall failed: {error}",
 			"btn.checkUpdate": "Check update",
 			"btn.checkUpdate.busy": "Checking…",
+			"selfcheck.button": "Self-check",
+			"selfcheck.running": "Checking…",
+			"selfcheck.title": "Layer self-check",
+			"maintenance.backup": "Create snapshot",
+			"maintenance.busy": "Snapshotting…",
+			"maintenance.count": "{n} snapshots, {mb} MB",
+			"features.title": "Runtime features",
+			"features.hint": "The three modes above are quick presets; the checkboxes below can be adjusted individually. Prompt injection / capability protocol / auto-continue can noticeably affect context and answer style. Host patches stay under Apply state.",
+			"features.all": "All on",
+			"features.smart": "Light mode",
+			"features.none": "All off (runtime)",
+			"features.mode.all": "All on",
+			"features.mode.smart": "Light mode",
+			"features.mode.none": "All off",
+			"features.mode.custom": "Custom",
+			"features.current": "Current mode: {mode}",
+			"features.desc.all": "Every runtime feature is on.",
+			"features.desc.smart": "Keep main prompt injection and automatic request retry; turn off capability protocol, auto-continue, refusal retry and red-team tools.",
+			"features.desc.none": "Every runtime feature is off; host patches still need a separate Revert.",
+			"features.desc.custom": "Custom combination; the checkboxes below decide what is active.",
+			"features.saved": "Saved",
+			"features.restartRequired": "Saved. Restart the host to apply.",
+			"features.master": "Master",
+			"features.promptInject": "Prompt injection",
+			"features.capabilityProtocol": "Capability protocol",
+			"features.autoRetry": "Auto retry",
+			"features.autoContinue": "Auto continue",
+			"features.refusalRetry": "Refusal retry",
+			"features.redteamTools": "Red-team tools",
+			"features.hostPatches": "Host patches",
+			"patch.status.none": "Not applied",
+			"patch.status.partial": "Partially applied",
+			"patch.status.done": "Applied",
+			"patch.status.loading": "Loading",
+			"patch.status.missing": "Host not found",
+			"patch.apply": "Apply patches",
+			"patch.applyRemaining": "Apply remaining {n}",
+			"patch.revert": "Revert patches",
+			"patch.appliedCount": "Applied {a} / {t}",
+			"patch.pendingCount": "Pending {n}",
+			"patch.skippedCount": "Skipped {n}",
+			"features.allFeatures": "All features",
+			"features.masterOff": "All off (runtime) is active; every child switch below is effectively off.",
 			"btn.doUpdate": "Update",
 			"btn.doUpdate.busy": "Updating…",
 			"channel.title": "Channel",
@@ -980,7 +1068,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 .dshp-cr-row label{display:inline-flex;align-items:center;gap:6px;color:var(--dshp-ink);cursor:pointer}
 .dshp-cr-num{width:64px;min-width:64px;height:28px;padding:0 8px}
 .dshp-cr-text{width:120px;min-width:88px;height:28px;padding:0 8px}
-.dshp-ver{width:100%;min-width:0;max-width:none;height:32px;padding:0 10px;font-size:12px}
+.dshp-ver{width:100%;min-width:0;max-width:none;height:32px;padding:0 30px 0 10px;font-size:12px}
+select.dshp-field{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--dshp-mute) 50%),linear-gradient(135deg,var(--dshp-mute) 50%,transparent 50%);background-position:calc(100% - 14px) 50%,calc(100% - 9px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:30px}
 .dshp-rel{margin:0;display:flex;flex-direction:column;gap:8px}
 .dshp-now{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0}
 .dshp-now-label{font-size:12px;line-height:18px;color:var(--dshp-mute)}
@@ -1172,6 +1261,26 @@ body:not([data-ds-dark-theme]) .dshp-auth-legal{background:var(--dsw-alias-bg-la
 .dshp-dock[data-theme="white"] .dshp-dock-body .rt-err{color:var(--dsw-alias-state-error-primary,#ef4444)!important}
 .dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-err{color:var(--dsw-alias-state-error-primary,#f25a5a)!important}
 .dshp-dock-body .rt-rep-http,.dshp-dock-body pre{background:var(--dsw-alias-markdown-code-block,#f5f5f5)!important;color:var(--dshp-ink)!important;border:.5px solid var(--dsw-alias-border-l2,#e5e5e5)!important}
+.dshp-overview{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:12px 0 4px;border-top:.5px solid var(--dsw-alias-border-l1,var(--dshp-line))}
+.dshp-overview-count{display:flex;flex-direction:column;gap:2px;min-width:0}
+.dshp-overview-count b{font-size:22px;line-height:30px;font-weight:550;font-variant-numeric:tabular-nums}
+.dshp-overview-count span{font-size:12px;line-height:18px;color:var(--dshp-mute)}
+.dshp-disclosure{border-top:.5px solid var(--dsw-alias-border-l1,var(--dshp-line));margin-top:2px;padding-top:10px}
+.dshp-disclosure>summary{display:flex;align-items:center;gap:6px;cursor:pointer;list-style:none;font-size:13px;line-height:20px;color:var(--dshp-mute);user-select:none}
+.dshp-disclosure>summary::-webkit-details-marker{display:none}
+.dshp-disclosure>summary::before{content:"▸";font-size:11px;color:var(--dshp-mute);transition:transform .15s var(--dshp-ease)}
+.dshp-disclosure[open]>summary::before{transform:rotate(90deg)}
+.dshp-disclosure>summary:hover{color:var(--dshp-ink)}
+.dshp-disclosure-body{display:flex;flex-direction:column;gap:12px;padding-top:12px}
+.dshp-patch-block{border-top:.5px solid var(--dsw-alias-border-l1,var(--dshp-line));padding-top:12px;display:flex;flex-direction:column;gap:8px}
+.dshp-patch-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.dshp-patch-title{display:flex;align-items:center;gap:8px;min-width:0}
+.dshp-patch-title h4{font-size:14px;line-height:22px;font-weight:500;margin:0}
+.dshp-patch-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dshp-patch-stats{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;min-height:20px;font-size:12px;line-height:18px;color:var(--dshp-mute)}
+.dshp-patch-stats b{font-size:16px;line-height:24px;font-weight:550;color:var(--dshp-ink);font-variant-numeric:tabular-nums}
+.dshp-overview .dshp-row{margin:0}
+@media (max-width:520px){.dshp-overview{align-items:flex-start;flex-direction:column}.dshp-overview .dshp-row{width:100%}.dshp-overview .dshp-row .dshp-btn{flex:1}}
 `;
 
 		function formatSize(bytes) {
@@ -1478,6 +1587,129 @@ body:not([data-ds-dark-theme]) .dshp-auth-legal{background:var(--dsw-alias-bg-la
 			);
 		}
 
+		function FeatureSection(props = {}) {
+			const t = useT();
+			const { restartBusy = false, onRestart } = props;
+			const [flags, setFlags] = useState(null);
+			const [busy, setBusy] = useState(false);
+			const [restartRequired, setRestartRequired] = useState(false);
+			const [notice, setNotice] = useState({ kind: "idle", text: "" });
+
+			useEffect(() => {
+				apiJson("/dsh-purge/features")
+					.then((d) => { if (d && d.ok && d.features) setFlags(d.features); })
+					.catch(() => {});
+			}, []);
+
+			const save = (patch) => {
+				if (!flags || busy) return;
+				const before = { ...flags };
+				setBusy(true);
+				setNotice({ kind: "idle", text: "" });
+				apiJson("/dsh-purge/features", {
+					method: "POST",
+					headers: { "content-type": "application/json" },
+					body: JSON.stringify({ patch }),
+				}).then((d) => {
+					if (!d || !d.ok) throw new Error((d && d.error) || "save failed");
+					const next = d.features || {};
+					const needsRestart = before.redteamTools !== next.redteamTools
+						|| (before.master !== next.master && (before.redteamTools === true || next.redteamTools === true));
+					setRestartRequired(needsRestart);
+					setFlags(d.features);
+					setNotice({ kind: "ok", text: t("features.saved") });
+				}).catch((e) => setNotice({ kind: "error", text: String((e && e.message) || e) }))
+					.finally(() => setBusy(false));
+			};
+
+			const preset = (mode) => {
+				const patch = { master: mode !== "none" };
+				for (const [key] of rows) patch[key] = mode === "all" ? true : mode === "smart" ? (key === "promptInject" || key === "autoRetry") : false;
+				save(patch);
+			};
+
+			if (!flags) return null;
+			const rows = [
+				["promptInject", "features.promptInject"],
+				["capabilityProtocol", "features.capabilityProtocol"],
+				["autoRetry", "features.autoRetry"],
+				["autoContinue", "features.autoContinue"],
+				["refusalRetry", "features.refusalRetry"],
+				["redteamTools", "features.redteamTools"],
+			];
+			const allOn = flags.master === true && rows.every(([key]) => flags[key] === true);
+			const smartOn = flags.master === true && flags.promptInject === true && flags.capabilityProtocol === false
+				&& flags.autoRetry === true && flags.autoContinue === false && flags.refusalRetry === false && flags.redteamTools === false;
+			const noneOn = flags.master === false && rows.every(([key]) => flags[key] === false);
+			const activeMode = allOn ? "all" : smartOn ? "smart" : noneOn ? "none" : "custom";
+			return h("div", { className: "dshp-cr", style: { marginTop: 12 } },
+				h("div", { className: "dshp-sub" },
+					h("h4", null, t("features.title")),
+					noticeNode(notice),
+				),
+				h("div", { className: "dshp-switch", role: "group", "aria-label": t("features.title"), style: { marginTop: 4 } },
+					[["all", t("features.mode.all")], ["smart", t("features.mode.smart")], ["none", t("features.mode.none")]].map(([id, label]) =>
+						h("button", {
+							key: id,
+							type: "button",
+							className: activeMode === id ? "is-on" : "",
+							disabled: busy,
+							onClick: () => preset(id),
+						}, label)
+					),
+				),
+				rows.map(([key, label]) => h("label", { key, style: { display: "block", marginTop: 4 } },
+					h("input", {
+						type: "checkbox",
+						checked: flags[key] === true,
+						disabled: busy,
+						onChange: (e) => save({ [key]: e.target.checked, ...(e.target.checked ? { master: true } : {}) }),
+					}),
+					t(label),
+				)),
+				restartRequired ? h("div", { className: "dshp-ask", style: { marginTop: 10 } },
+					h("span", null, t("features.restartRequired")),
+					h(Btn, { tiny: true, kind: "primary", disabled: busy || restartBusy, onClick: onRestart }, restartBusy ? t("btn.restart.busy") : t("btn.restart")),
+				) : null,
+			);
+		}
+
+		function HostPatchSection(props) {
+			const t = useT();
+			const { state = null, busy = false, notice = null, applyDisabled = false, onApply, onRevert } = props;
+			const total = Number(state && state.patches_total) || 0;
+			const applied = Number(state && state.patches_applied) || 0;
+			const pending = Number(state && state.patches_pending) || 0;
+			const skipped = Number(state && state.patches_skipped) || 0;
+			const located = Boolean(state && state.ai_base);
+			const complete = located && total > 0 && applied >= total;
+			const partial = located && applied > 0 && applied < total;
+			const statusKind = !state ? "miss" : complete ? "ok" : partial ? "wait" : located ? "miss" : "bad";
+			const statusText = !state ? t("patch.status.loading") : complete ? t("patch.status.done") : partial ? t("patch.status.partial") : located ? t("patch.status.none") : t("patch.status.missing");
+			const primaryLabel = partial ? t("patch.applyRemaining", { n: Math.max(0, pending) }) : t("patch.apply");
+			return h("div", { className: "dshp-patch-block" },
+				h("div", { className: "dshp-patch-head" },
+					h("div", { className: "dshp-patch-title" },
+						h("h4", null, t("features.hostPatches")),
+						h("span", { className: "dshp-pill is-" + statusKind }, statusText),
+					),
+					h("div", { className: "dshp-patch-actions" },
+						h(Btn, { tiny: true, kind: "primary", disabled: busy || !located || applyDisabled, onClick: onApply }, primaryLabel),
+						applied > 0 ? h(Btn, { tiny: true, disabled: busy || !located, onClick: onRevert }, t("patch.revert")) : null,
+					),
+				),
+				state ? h("div", { className: "dshp-patch-stats" },
+					h("b", null, t("patch.appliedCount", { a: applied, t: total })),
+					h("span", null, t("patch.pendingCount", { n: pending })),
+					skipped > 0 ? h("span", null, t("patch.skippedCount", { n: skipped })) : null,
+					noticeNode(notice),
+				) : h("div", { className: "dshp-patch-stats" },
+					h("div", { className: "dshp-skel", style: { width: 120 } }),
+					h("div", { className: "dshp-skel", style: { width: 90 } }),
+				),
+			);
+		}
+
 		function ContinueRetrySection() {
 			const t = useT();
 			const [cfg, setCfg] = useState(null);
@@ -1622,6 +1854,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-legal{background:var(--dsw-alias-bg-la
 			const [ownServers, setOwnServers] = useState("");
 			const [ownLoaded, setOwnLoaded] = useState(false);
 			const [patchBusy, setPatchBusy] = useState(false);
+			const [restartBusy, setRestartBusy] = useState(false);
 			const [updateBusy, setUpdateBusy] = useState(false);
 			const [canApplyUpdate, setCanApplyUpdate] = useState(false);
 			const [updateJob, setUpdateJob] = useState(null);
@@ -1632,6 +1865,10 @@ body:not([data-ds-dark-theme]) .dshp-auth-legal{background:var(--dsw-alias-bg-la
 			const [notice, setNotice] = useState({ kind: "idle", text: "" });
 			const [updateNotice, setUpdateNotice] = useState({ kind: "idle", text: "" });
 			const [updateInfo, setUpdateInfo] = useState(null);
+			const [selfcheckBusy, setSelfcheckBusy] = useState(false);
+			const [selfcheckReport, setSelfcheckReport] = useState(null);
+			const [maintenanceBusy, setMaintenanceBusy] = useState(false);
+			const [maintenanceInfo, setMaintenanceInfo] = useState(null);
 			const [channel, setChannel] = useState("stable");
 			const [pick, setPick] = useState({ stable: "", beta: "" });
 			const actionTicket = useRef(0);
@@ -1687,6 +1924,32 @@ body:not([data-ds-dark-theme]) .dshp-auth-legal{background:var(--dsw-alias-bg-la
 				if (d.error) text = d.error;
 				setUpdateNotice({ kind: d.ok === false || d.error ? "error" : "ok", text });
 			}, []);
+
+			const refreshMaintenance = useCallback(() => {
+				apiJson("/dsh-purge/maintenance")
+					.then((d) => setMaintenanceInfo(d))
+					.catch(() => setMaintenanceInfo(null));
+			}, []);
+			const backupNow = useCallback(() => {
+				setMaintenanceBusy(true);
+				apiJson("/dsh-purge/maintenance", {
+					method: "POST",
+					headers: { "content-type": "application/json" },
+					body: JSON.stringify({ op: "backup" }),
+				}).then((d) => {
+					if (!d || d.ok === false) throw new Error((d && d.error) || "backup failed");
+					return refreshMaintenance();
+				}).catch((e) => setSelfcheckReport({ ok: false, error: String((e && e.message) || e) }))
+					.finally(() => setMaintenanceBusy(false));
+			}, [refreshMaintenance]);
+			const runSelfCheck = useCallback(() => {
+				setSelfcheckBusy(true);
+				apiJson("/dsh-purge/selfcheck")
+					.then((d) => setSelfcheckReport(d))
+					.catch((e) => setSelfcheckReport({ ok: false, error: String((e && e.message) || e) }))
+					.finally(() => setSelfcheckBusy(false));
+			}, []);
+			useEffect(() => { refreshMaintenance(); }, [refreshMaintenance]);
 
 			const checkUpdate = useCallback((id) => {
 				setUpdateBusy(true);
@@ -1750,7 +2013,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-legal{background:var(--dsw-alias-bg-la
 
 			const doUpdate = useCallback((id) => {
 				const lane = id === "beta" ? "beta" : "stable";
-				postUpdate({ op: "apply", ref: lane === "beta" ? "beta" : "master", channel: lane }, "done", id).catch(() => {});
+				postUpdate({ op: "apply", ref: lane === "beta" ? "beta" : "main", channel: lane }, "done", id).catch(() => {});
 			}, [postUpdate]);
 
 			const changeChannel = useCallback((next) => {
@@ -2084,6 +2347,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-legal{background:var(--dsw-alias-bg-la
 			const located = !!(s && s.ai_base);
 			const hostSurface = hostSurfaceOf(s);
 			const desktopLikely = hostSurface === "desktop" || clientGuessSurface() === "desktop";
+			const doRestart = () => restartDsh(setNotice, setRestartBusy, t, hostSurface);
 			const sealedReady = !located && desktopLikely && !!(s && (s.asar_still_sealed || s.desktop_exe || s.desktop_install));
 			const patchesLost = !located && !!(s && s.patches_lost);
 			const tally = located ? tallyPatches(patchRowsOf(s)) : { applied: 0, pending: 0, unmatched: 0, skipped: 0, total: 0 };
@@ -2160,137 +2424,117 @@ body:not([data-ds-dark-theme]) .dshp-auth-legal{background:var(--dsw-alias-bg-la
 				h("div", { className: "dshp-head" },
 					h("div", null,
 						h("h3", { className: "dshp-title" }, t("purge.title")),
-						h("p", { className: "dshp-panel-lead" }, t("purge.lead")),
-					),
-					h("span", { className: "dshp-pill" }, t("surface." + hostSurface)),
-				),
-				h("div", { className: "dshp-rel" },
-					h("div", { className: "dshp-now" },
-						h("span", { className: "dshp-now-label" }, t("channel.local")),
-						h("b", { className: "dshp-now-ver" }, localVer ? "v" + localVer : "—"),
-						h("em", { className: "dshp-now-mark" }, t("update.current")),
-					),
-					h("div", { className: "dshp-editions" },
-						renderEdition("stable"),
-						renderEdition("beta"),
-					),
-					noticeNode(updateNotice),
-				),
-				s ? h("div", { className: "dshp-metrics" },
-					h("div", { className: "dshp-metric" },
-						h("b", null, located ? (applied + " / " + total) : (patchesLost ? t("metric.lost.count") : (sealedReady ? t("metric.sealed.count") : t("metric.unlocated.count")))),
-						h("span", null, !located ? (patchesLost ? t("metric.lost") : (sealedReady ? t("metric.sealed") : t("metric.unlocated"))) : (metricNotes.length ? metricNotes.join(" · ") : t("metric.purged"))),
-					),
-					h("div", { className: "dshp-metric" },
-						h("b", { style: { fontSize: 13, fontFamily: "var(--dshp-mono)", fontWeight: 500 } },
-							h("span", { className: "dshp-pill is-" + shimKind(s.shim_cmd) }, "cmd"),
-							" ",
-							h("span", { className: "dshp-pill is-" + shimKind(s.shim_ps1) }, "ps1"),
-							" ",
-							h("span", { className: "dshp-pill is-" + shimKind(s.shim_bin || "missing") }, "unix"),
-						),
-						h("span", null, (s.shim_cmd === "n/a" && s.shim_ps1 === "n/a" && (s.shim_bin === "n/a" || !s.shim_bin)) ? t("metric.shim.na") : t("metric.shim")),
-					),
-					h("div", { className: "dshp-metric" },
-						h("b", null, s.has_backup ? t("metric.bak.yes") : t("metric.bak.no")),
-						h("span", null, t("metric.bak.hint")),
-					),
-				) : h("div", { className: "dshp-metrics" },
-					h("div", { className: "dshp-metric" }, h("div", { className: "dshp-skel" }), h("div", { className: "dshp-skel", style: { width: "40%" } })),
-					h("div", { className: "dshp-metric" }, h("div", { className: "dshp-skel" }), h("div", { className: "dshp-skel", style: { width: "40%" } })),
-					h("div", { className: "dshp-metric" }, h("div", { className: "dshp-skel" }), h("div", { className: "dshp-skel", style: { width: "40%" } })),
-				),
-				h("div", { className: "dshp-bar", "aria-hidden": "true" }, h("i", { style: { width: pct + "%" } })),
-				h(PatchGroups, { state: s }),
-				h(HooksDenySection, { onSaved: loadAll }),
-				h(GateSection, { t }),
-				h("div", { className: "dshp-row", style: { marginTop: 2 } },
-					h(Btn, { kind: "primary", disabled: patchBusy || uninstallBusy || !overrideLoaded, onClick: () => doAction("apply", "action.apply") }, patchBusy ? t("btn.apply.busy") : t("btn.apply")),
-					h(Btn, { kind: "ghost", disabled: patchBusy || uninstallBusy, onClick: () => doAction("revert", "action.revert") }, t("btn.revert")),
-					h(Btn, { kind: "danger", disabled: patchBusy || uninstallBusy, onClick: () => setAskUninstall(true) }, uninstallBusy ? t("btn.uninstall.busy") : t("btn.uninstall")),
-					noticeNode(notice),
-				),
-				h("p", { className: "dshp-block-hint" }, t("apply.hint")),
-				s && !s.ai_base ? h("p", { className: "dshp-block-hint", style: { color: "var(--dshp-bad)" } }, hostText(t, "warn.noRoot", hostSurface)) : null,
-				s && s.ai_base && s.override_status === "missing" ? h("p", { className: "dshp-block-hint" }, t("warn.noInject")) : null,
-				askRestart ? h(RestartAsk, {
-					t: t,
-					theme: detectHostTheme(),
-					onLater: () => {
-						suppressRestartAsk.current = true;
-						setAskRestart(false);
-					},
-					onRestart: () => {
-						suppressRestartAsk.current = true;
-						setAskRestart(false);
-						restartDsh(setNotice, function () {}, t, hostSurface);
-					},
-				}) : null,
-			),
-			h("section", { className: "dshp-panel", "aria-label": t("override.title") },
-				h("div", { className: "dshp-head" },
-					h("div", null,
-						h("h3", { className: "dshp-title" }, t("override.title")),
-						h("p", { className: "dshp-panel-lead" }, t("override.lead")),
 					),
 					h("div", { className: "dshp-row", style: { margin: 0 } },
-						h(Btn, { kind: "primary", tiny: true, disabled: patchBusy || !overrideLoaded, onClick: saveOverride }, t("btn.saveInject")),
-						h(Btn, { tiny: true, disabled: patchBusy || !overrideLoaded || !defaultOverride, onClick: restoreOverride }, t("btn.restoreInject")),
+						h(Btn, { tiny: true, disabled: patchBusy || restartBusy, onClick: doRestart }, restartBusy ? t("btn.restart.busy") : t("btn.restart")),
+						h("span", { className: "dshp-pill" }, t("surface." + hostSurface)),
 					),
 				),
-				h("textarea", {
-					className: "dshp-area",
-					ref: promptAreaRef,
-					value: override,
-					onChange: (e) => {
-						overrideRef.current = e.target.value;
-						setOverride(e.target.value);
-					},
-					spellCheck: false,
-					placeholder: "",
+				h(FeatureSection, { restartBusy, onRestart: doRestart }),
+				h(HostPatchSection, {
+					state: s,
+					busy: patchBusy,
+					notice,
+					applyDisabled: !overrideLoaded,
+					onApply: () => doAction("apply", "action.apply"),
+					onRevert: () => doAction("revert", "action.revert"),
 				}),
-				promptBoxEmpty(override) ? h("p", {
-					className: "dshp-block-hint",
-					style: { color: "var(--dshp-bad)" },
-				}, t("need.prompt")) : null,
-			),
-			h("section", { className: "dshp-panel", "aria-label": t("own.title") },
-				h("div", { className: "dshp-head" },
-					h("div", null,
-						h("h3", { className: "dshp-title" }, t("own.title")),
-						h("p", { className: "dshp-panel-lead" }, t("own.hint")),
+				h("details", { className: "dshp-disclosure" },
+					h("summary", null, t("advanced.title")),
+					h("div", { className: "dshp-disclosure-body" },
+						h("div", { className: "dshp-rel" },
+							h("div", { className: "dshp-now" },
+								h("span", { className: "dshp-now-label" }, t("channel.local")),
+								h("b", { className: "dshp-now-ver" }, localVer ? "v" + localVer : "—"),
+								h("em", { className: "dshp-now-mark" }, t("update.current")),
+							),
+							h("div", { className: "dshp-editions" },
+								renderEdition("stable"),
+								renderEdition("beta"),
+							),
+							noticeNode(updateNotice),
+							h("div", { className: "dshp-selfcheck" },
+								h(Btn, { tiny: true, disabled: selfcheckBusy, onClick: runSelfCheck }, selfcheckBusy ? t("selfcheck.running") : t("selfcheck.button")),
+								h(Btn, { tiny: true, disabled: maintenanceBusy, onClick: backupNow }, maintenanceBusy ? t("maintenance.busy") : t("maintenance.backup")),
+								maintenanceInfo ? h("span", { className: "dshp-hint" }, t("maintenance.count", { n: maintenanceInfo.count || 0, mb: Math.max(0, Math.round((maintenanceInfo.bytes || 0) / 1024 / 1024)) })) : null,
+								selfcheckReport ? h("pre", { className: "dshp-audit", "aria-label": t("selfcheck.title") }, JSON.stringify(selfcheckReport, null, 2)) : null,
+							),
+						),
+						s ? h("div", { className: "dshp-metrics" },
+							h("div", { className: "dshp-metric" },
+								h("b", null, located ? (applied + " / " + total) : (patchesLost ? t("metric.lost.count") : (sealedReady ? t("metric.sealed.count") : t("metric.unlocated.count")))),
+								h("span", null, !located ? (patchesLost ? t("metric.lost") : (sealedReady ? t("metric.sealed") : t("metric.unlocated"))) : (metricNotes.length ? metricNotes.join(" · ") : t("metric.purged"))),
+							),
+							h("div", { className: "dshp-metric" },
+								h("b", { style: { fontSize: 13, fontFamily: "var(--dshp-mono)", fontWeight: 500 } },
+									h("span", { className: "dshp-pill is-" + shimKind(s.shim_cmd) }, "cmd"),
+									" ",
+									h("span", { className: "dshp-pill is-" + shimKind(s.shim_ps1) }, "ps1"),
+									" ",
+									h("span", { className: "dshp-pill is-" + shimKind(s.shim_bin || "missing") }, "unix"),
+								),
+								h("span", null, (s.shim_cmd === "n/a" && s.shim_ps1 === "n/a" && (s.shim_bin === "n/a" || !s.shim_bin)) ? t("metric.shim.na") : t("metric.shim")),
+							),
+							h("div", { className: "dshp-metric" },
+								h("b", null, s.has_backup ? t("metric.bak.yes") : t("metric.bak.no")),
+								h("span", null, t("metric.bak.hint")),
+							),
+						) : null,
+						h(PatchGroups, { state: s }),
+						h(HooksDenySection, { onSaved: loadAll }),
+						h(GateSection, { t }),
+						h("div", { className: "dshp-sub" }, h("h4", null, t("own.title"))),
+						h("textarea", {
+							className: "dshp-area",
+							value: ownServers,
+							onChange: (e) => setOwnServers(e.target.value),
+							spellCheck: false,
+							rows: 4,
+							style: { minHeight: 96 },
+						}),
+						h("div", { className: "dshp-row", style: { marginTop: 2 } },
+							h(Btn, {
+								kind: "primary",
+								tiny: true,
+								disabled: !ownLoaded,
+								onClick: () => {
+									fetch("/dsh-purge/own-servers", {
+										method: "POST",
+										headers: { "content-type": "application/json" },
+										body: JSON.stringify({ content: ownServers }),
+									}).then((r) => r.json()).then((d) => {
+										if (!d || !d.ok) {
+											setNotice({ kind: "error", text: (d && d.error) || t("err.override", { error: "" }) });
+											return;
+										}
+										if (typeof d.content === "string") setOwnServers(d.content);
+										setNotice({ kind: "ok", text: d.dropped > 0 ? t("saved.own.dropped", { n: d.dropped }) : t("saved.own") });
+									}).catch((e) => setNotice({ kind: "error", text: e.message }));
+								},
+							}, t("own.save")),
+							h(Btn, { kind: "danger", tiny: true, disabled: patchBusy || uninstallBusy, onClick: () => setAskUninstall(true) }, t("btn.uninstall")),
+						),
+						h("div", { className: "dshp-sub" }, h("h4", null, t("override.title"))),
+						h("textarea", {
+							className: "dshp-area",
+							ref: promptAreaRef,
+							value: override,
+							onChange: (e) => {
+								overrideRef.current = e.target.value;
+								setOverride(e.target.value);
+							},
+							spellCheck: false,
+							placeholder: "",
+						}),
+						h("div", { className: "dshp-row", style: { marginTop: 2 } },
+							h(Btn, { kind: "primary", tiny: true, disabled: patchBusy || !overrideLoaded, onClick: saveOverride }, t("btn.saveInject")),
+							h(Btn, { tiny: true, disabled: patchBusy || !overrideLoaded || !defaultOverride, onClick: restoreOverride }, t("btn.restoreInject")),
+						),
+						promptBoxEmpty(override) ? h("p", { className: "dshp-block-hint", style: { color: "var(--dshp-bad)" } }, t("need.prompt")) : null,
 					),
-					h(Btn, {
-						kind: "primary",
-						tiny: true,
-						disabled: !ownLoaded,
-						onClick: () => {
-							fetch("/dsh-purge/own-servers", {
-								method: "POST",
-								headers: { "content-type": "application/json" },
-								body: JSON.stringify({ content: ownServers }),
-							}).then((r) => r.json()).then((d) => {
-								if (!d || !d.ok) {
-									setNotice({ kind: "error", text: (d && d.error) || t("err.override", { error: "" }) });
-									return;
-								}
-								if (typeof d.content === "string") setOwnServers(d.content);
-								setNotice({
-									kind: "ok",
-									text: d.dropped > 0 ? t("saved.own.dropped", { n: d.dropped }) : t("saved.own"),
-								});
-							}).catch((e) => setNotice({ kind: "error", text: e.message }));
-						},
-					}, t("own.save")),
 				),
-				h("textarea", {
-					className: "dshp-area",
-					value: ownServers,
-					onChange: (e) => setOwnServers(e.target.value),
-					spellCheck: false,
-					rows: 4,
-					style: { minHeight: 96 },
-				}),
+				s && !s.ai_base ? h("p", { className: "dshp-block-hint", style: { color: "var(--dshp-bad)" } }, hostText(t, "warn.noRoot", hostSurface)) : null,
+				s && s.ai_base && s.override_status === "missing" ? h("p", { className: "dshp-block-hint" }, t("warn.noInject")) : null,
 			),
 			askUninstall ? h("div", {
 				className: "dshp-modal-bg",
@@ -2308,7 +2552,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-legal{background:var(--dsw-alias-bg-la
 					),
 				),
 			) : null,
-			);
+		);
 		}
 
 		function ruleLabel(r) {
@@ -8641,7 +8885,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-legal{background:var(--dsw-alias-bg-la
 				},
 			},
 				h("div", { className: "dshp-dock-head", onMouseDown: startDrag, title: "按住拖动面板" },
-					h("b", null, "dsh-purge"),
+					h("b", null, "dsh-purge-plus"),
 					h("span", { style: { flex: 1 } }),
 					st.tab === "drill" && readDrillAuth()
 						? h("button", { type: "button", onClick: () => requestDrill("full") }, t("dock.full"))
@@ -8720,7 +8964,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-legal{background:var(--dsw-alias-bg-la
 			 * order 排在 xdpool(440) 之后，紧贴它的下一行。 */
 			ctx.slots.inject("settings.section", () => ctx.slots.register({
 				name: "settings.section",
-				id: "dsh-purge",
+				id: "dsh-purge-plus",
 				order: 450,
 				label: () => t("page.nav"),
 				locale: NS,

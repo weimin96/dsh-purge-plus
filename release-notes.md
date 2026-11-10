@@ -1,3 +1,23 @@
+# 1.5.0
+
+## 中文
+
+- 本分支版本：**1.5.0**，`dshTarget: 0.2.1-rc.2`。
+- 项目更名为 **dsh-purge-plus**，仓库、更新源和发布 workflow 统一指向 `weimin96/dsh-purge-plus`；用户数据目录继续保留 `$DSH_HOME/dsh-purge`，已有提示词、规则、快照和功能开关不丢。
+- 新增补丁能力：`expect` 精确命中契约、`patchStatusDetail` / `patchDrift` 锚点漂移诊断、25 层 `selfcheck`、运行时探针、维护快照、更新前自动快照、`unrestricted` 预设和命令注册兜底。
+- 设置页重构：**运行功能**与**宿主补丁**分离。运行功能提供全部开启 / 轻量模式 / 全部关闭和逐项开关；宿主补丁独立显示已应用 / 总数、待处理 / 跳过，并提供应用、还原和重启按钮。
+- 修改红队工具后提示重启；宿主补丁应用 / 还原走重启流程；其余运行时开关下一轮对话立即生效。
+- 说明：当前机器为 DSH 0.2.2-rc.1，而补丁表主要按 0.2.1-rc.2 编写，部分补丁可能因锚点漂移保持 pending 或 skipped；运行 `dsh-purge-plus --selfcheck` 可查看真实状态。
+
+## English
+
+- Version **1.5.0**, `dshTarget: 0.2.1-rc.2`.
+- Renamed to **dsh-purge-plus**; repository, update source and release workflow now point to `weimin96/dsh-purge-plus`. Existing data under `$DSH_HOME/dsh-purge` is preserved.
+- Added patch hit contracts (`expect`), patch status/drift diagnostics, 25-layer self-check, runtime probe, maintenance snapshots, pre-update snapshots, unrestricted preset and command registration fallback.
+- Redesigned settings: **Runtime features** and **Host patches** are separate. Runtime features have All on / Light / All off and per-feature switches; host patches show applied / total, pending / skipped, with Apply, Revert and Restart buttons.
+- Red-team tool changes prompt for a restart; host patch apply/revert uses the restart flow; other runtime switches take effect on the next turn.
+- Note: this machine runs DSH 0.2.2-rc.1 while the patch table primarily targets 0.2.1-rc.2; some patches may remain pending or skipped. Use `dsh-purge-plus --selfcheck` for the real state.
+
 # 1.3.1
 
 ## 中文

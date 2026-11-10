@@ -1,7 +1,7 @@
 {
-  "name": "dsh-purge",
-  "version": "1.4.2",
-  "description": "DeepSeek Harness 破甲：让所有模型都能破甲，不同模型可换不同提示词；默认提示词面向国模「小码酱」。Jailbreak for every model — swap prompts per model. 求 Star 收藏 ⭐ 如要二开，请查看署名要求部分",
+  "name": "dsh-purge-plus",
+  "version": "1.5.0",
+  "description": "DeepSeek Harness 破甲与红队评测插件（dsh-purge-plus）：宿主补丁、提示词注入、工具开关、自检与维护快照。",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -13,10 +13,11 @@
     "./redteam/store": "./lib/redteam/store.js",
     "./redteam/ui": "./lib/redteam/ui.js",
     "./redteam/tools": "./lib/redteam/tools.js",
+    "./presets-plugin": "./lib/presets-plugin.js",
     "./package.json": "./package.json"
   },
   "bin": {
-    "dsh-purge": "bin/dsh-purge.js"
+    "dsh-purge-plus": "bin/dsh-purge-plus.js"
   },
   "files": [
     "lib",
@@ -40,6 +41,7 @@
   "scripts": {
     "embed-prompt": "node scripts/embed-default-prompt.mjs",
     "build:client": "node scripts/build-client.mjs",
+    "test": "node --test test/*.test.mjs && node test/gate.mjs && node test/cwd-variable.mjs",
     "test:gate": "node test/gate.mjs",
     "test:cwd": "node test/cwd-variable.mjs"
   },
@@ -64,11 +66,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/YuJunZhiXue/dsh-purge.git"
+    "url": "git+https://github.com/weimin96/dsh-purge-plus.git"
   },
-  "homepage": "https://github.com/YuJunZhiXue/dsh-purge#readme",
+  "homepage": "https://github.com/weimin96/dsh-purge-plus#readme",
   "bugs": {
-    "url": "https://github.com/YuJunZhiXue/dsh-purge/issues"
+    "url": "https://github.com/weimin96/dsh-purge-plus/issues"
   },
   "dsh": {
     "bundle": {
@@ -86,11 +88,24 @@
     },
     "install": {
       "preferred": "tarball",
-      "tarball": "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz",
-      "zip": "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip",
-      "git": "https://github.com/YuJunZhiXue/dsh-purge.git"
+      "tarball": "https://github.com/weimin96/dsh-purge-plus/archive/refs/heads/main.tar.gz",
+      "zip": "https://github.com/weimin96/dsh-purge-plus/archive/refs/heads/main.zip",
+      "git": "https://github.com/weimin96/dsh-purge-plus.git"
     },
-    "version": "1.4.2"
+    "compatibility": {
+      "dsh": ">=0.2.1-rc.1 <0.3.0",
+      "profiles": [
+        "desktop",
+        "web"
+      ],
+      "dshReleases": {
+        "0.2.1-rc.1": "compatible",
+        "0.2.1-rc.2": "compatible",
+        "0.2.1-rc.3": "unknown",
+        "0.2.2-rc.1": "unknown"
+      }
+    },
+    "version": "1.5.0"
   },
   "publishConfig": {
     "access": "public"
@@ -101,5 +116,9 @@
   "engines": {
     "node": ">=18"
   },
-  "dshTarget": "0.2.1-rc.2"
+  "dshTarget": "0.2.1-rc.2",
+  "author": {
+    "name": "weimin96",
+    "url": "https://github.com/weimin96"
+  }
 }

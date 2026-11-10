@@ -7,6 +7,73 @@ Baseline: **1.2.0**. Everything below is what this fork adds, improves, or fixes
 
 ---
 
+## 1.5.0 — 参考 Community 1.6.86 的 P0 增强，并完成设置页重构
+
+本节记录本轮从 `kingcharleslzy-ai/dsh-purge` 1.6.86 选择性回移的能力，按本仓库的补丁编号与目录结构实现，不改变插件用途。
+
+### 项目更名
+
+- 项目名统一为 `dsh-purge-plus`，仓库地址迁移到 `https://github.com/weimin96/dsh-purge-plus`。
+- `package.json` 的 `name` / `bin` 改为 `dsh-purge-plus`；新增入口 `bin/dsh-purge-plus.js`。
+- 用户数据目录仍保留 `$DSH_HOME/dsh-purge`，避免已有提示词、规则、快照和开关丢失。
+- README 中英文版已重写；banner、欢迎页、默认仓库和更新来源同步新名称。
+
+### 新增：补丁命中契约
+
+- `lib/core.js` 的 `applyReplacementsToText` 支持 `replacement.expect: n`：字面量与正则都按精确命中数校验；0 次或多一次都整条拒写并返回 `hitMismatch`，不再静默 replace-all。
+- `patchStatusDetail()` 增加逐文件状态：`applied / pending / drifted / partial / unknown / skipped / missing_file`；文件存在但锚点全不中会显示 `drifted`，多目标部分命中显示 `partial`。
+- `patchDrift()` 输出每个漂移补丁的文件、锚点首行和候选落点，不写宿主；`/dsh-purge/diagnose` 与 `dsh-purge --diagnose` 可直接查看。
+- `lib/anchors.js` 支持 `$DSH_HOME/dsh-purge/anchor-overrides.json`：确认新锚点后可本地覆盖，不修改插件源码；`patchReplacements()` 自动叠加覆盖。
+- `patchStatusReady` 不再把 `drifted / partial / unknown` 当成成功。
+
+### 新增：自检与运行时探针
+
+- `lib/selfcheck.js`：22 个宿主补丁层 + runtime/config/layout 3 层 = 25 层自检，状态区分 `ok / pending / inferred / unknown / broken`。
+- `lib/probe.js`：30 分钟 nonce 探针；系统提示词只在 probe 存活时挂载 `dsh-purge:probe` 段，模型回显即可证明注入链路到达模型。
+- 新增 HTTP 接口：
+  - `GET /dsh-purge/diagnose`
+  - `GET /dsh-purge/selfcheck`
+  - `GET /dsh-purge/probe` / `POST /dsh-purge/probe`
+- 新增 CLI：
+  - `dsh-purge --selfcheck`
+  - `dsh-purge --diagnose`
+  - `dsh-purge --probe`
+- 命令注册增加冲突兜底：`/purge`、`/rules`、`/skills` 被其他插件占用时分别退到 `/purge-community`、`/purge-rules`、`/purge-skills`。
+
+### 新增：维护快照
+
+- `lib/maintenance.js`：插件目录快照、Profile 文件证据、`list / usage / verify / rollback / prune`。
+- 更新前自动快照：`lib/update.js` 的 `applyUpdate` 在覆盖任何文件前调用 `backupBeforeUpdate()`；快照失败则中止更新。
+- 新增 CLI：`dsh-purge --backup`、`--rollback <id>`、`--usage`、`--prune`。
+- 新增 `lib/redteam/atomic-write.js`：红队设置与平台配置改为临时文件 + fsync + rename，避免半截 JSON 静默丢设置。
+- 新增 `lib/redteam/evidence-ledger.mjs` 与 8 个证据账本工具：四档置信度、语义哈希、未核实计数与待查问题登记。
+- 新增 `lib/refusal-retry.js` / `lib/stream-observation.js` / `lib/tuning.js`：模型推脱检测与单次重试，默认关闭，可用 `dsh-purge --refusal-retry on|off` 切换。
+- `lib/update.js` 新增 `update-preferences.json`（autoCheck / autoInstall / intervalHours），并支持 POST /dsh-purge/update 的 preferences 操作。
+- `lib/index.js` 支持 `excludePresets`：按当前会话的有效预设排除 Purge 注入，子 Agent 使用自己的预设判断。
+- 新增 `lib/features.js` 运行时功能开关（`$DSH_HOME/dsh-purge/features.json`）：`master / promptInject / capabilityProtocol / autoRetry / autoContinue / refusalRetry / redteamTools`；支持 `all / smart / none` 三档预设。
+- 新增 `GET/POST /dsh-purge/features` 与设置页「功能开关」卡片：三档分段选择器「全部开启 / 轻量模式 / 全部关闭」，当前模式与说明直接显示在选项下方；也可逐项切换。
+- 轻量模式保留主提示词注入和请求异常自动重试，关闭能力协议、自动续跑、推脱重试和红队工具；全部关闭则连主提示词和自动重试一起关闭。提示词/重试开关立即生效，红队工具开关下次宿主加载时生效。
+- 设置页主面板收敛为「运行状态」：功能开关置顶，状态和「应用 / 还原」直接可见；版本更新、补丁列表、维护、Hooks、审批门、自己的服务器和提示词编辑收进「高级设置」折叠区。
+- 新增「宿主补丁」独立状态卡：显示已应用 / 总数、待处理 / 跳过，提供应用、还原和重启按钮。
+- 面板标题旁增加全局「重启」按钮；修改红队工具等需要重启的运行时开关时，保存后显示重启提示和快捷重启入口。
+- 新增 HTTP：`GET/POST /dsh-purge/maintenance`（GET 查看列表与占用，POST 支持 `backup / rollback / prune`）。
+- 快照默认保存于 `$DSH_HOME/dsh-purge/backups/<id>/`，manifest 记录文件数与 SHA-256。
+
+### 修复：发布与更新身份
+
+- `package.json` 的 `repository / homepage / bugs / dsh.install.*` 改为 `weimin96/dsh-purge-plus`，并补 `dsh.compatibility` 元数据。
+- `lib/update.js` 的 `REPO` 改为本地仓库，稳定分支改为 `main`。
+- `.github/workflows/release.yml` 改为监听 `main`、仅允许 `weimin96/dsh-purge-plus` 发布。
+
+### 测试
+
+- 新增 `test/engine.test.mjs`（expect 命中契约、patchStatusDetail、patchDrift）。
+- 新增 `test/selfcheck.test.mjs`（25 层、tally、probe TTL）。
+- 新增 `test/maintenance.test.mjs`（快照、校验、usage、回滚）。
+- `package.json` 增加 `npm test`；`test:cwd` 的 renderer 发现覆盖 macOS/Linux Node 前缀，`test:gate` 不再在仓库根创建临时目录。
+
+---
+
 ## 1.4.2 — 移除输入框里的「回退」按钮及其全部作用
 
 ### 移除内容

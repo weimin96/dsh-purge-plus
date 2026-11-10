@@ -2,12 +2,16 @@
 
 import * as core from "../lib/core.js";
 import * as rules from "../lib/rules.js";
+import * as selfcheck from "../lib/selfcheck.js";
+import { createProbe } from "../lib/probe.js";
+import * as maintenance from "../lib/maintenance.js";
+import { readTuning, writeTuning } from "../lib/tuning.js";
 
 const args = process.argv.slice(2);
 
 function printStatus(state) {
   const out = [];
-  out.push("dsh-purge 状态 / Status");
+  out.push("dsh-purge-plus 状态 / Status");
   out.push("  宿主 / surface " + (state.surface || "web"));
   out.push("  DSH_HOME      " + state.dsh_home);
   if (state.desktop_install) out.push("  桌面安装       " + state.desktop_install);
@@ -27,7 +31,7 @@ function printStatus(state) {
   out.push(`  补丁 ${state.patches_applied}/${core.ALL_PATCHES.length} 已清洗, ${state.patches_pending} 待清洗`);
   for (const p of core.ALL_PATCHES) {
     const s = state.patch_status[p.id];
-    const mark = s === "applied" ? "✓" : s === "pending" ? "✗" : "·";
+    const mark = s === "applied" ? "✓" : (s === "pending" || s === "drifted" || s === "partial" || s === "unknown") ? "✗" : "·";
     out.push(`    ${mark} [#${String(p.id).padEnd(2)}] ${p.name.padEnd(30)} ${p.layer}/${p.layer_en} — ${s}`);
   }
   out.push("");
@@ -36,20 +40,93 @@ function printStatus(state) {
 }
 
 async function main() {
-  const mode = args.find((a) => ["--apply", "--revert", "--uninstall", "--status", "--edit", "--help"].includes(a));
+  const mode = args.find((a) => ["--apply", "--revert", "--uninstall", "--status", "--edit", "--selfcheck", "--diagnose", "--probe", "--backup", "--rollback", "--usage", "--prune", "--refusal-retry", "--host-status", "--help"].includes(a));
 
   if (mode === "--help" || args.includes("-h")) {
-    console.log(`dsh-purge 用法:
-  dsh-purge --status     显示状态
-  dsh-purge --apply      应用全部清洗（提示词+代码+shim+override）
-  dsh-purge --revert     回滚还原
-  dsh-purge --uninstall  卸载插件（已应用则先还原）
-  dsh-purge --edit       编辑注入文件 prompt-inject.md
-  dsh-purge --help       帮助`);
+    console.log(`dsh-purge-plus 用法:
+  dsh-purge-plus --status      显示状态
+  dsh-purge-plus --host-status 只读查看宿主/实例布局（JSON）
+  dsh-purge-plus --apply       应用全部清洗（提示词+代码+shim+override）
+  dsh-purge-plus --revert      回滚还原
+  dsh-purge-plus --uninstall   卸载插件（已应用则先还原）
+  dsh-purge-plus --edit        编辑注入文件 prompt-inject.md
+  dsh-purge-plus --selfcheck   逐层自检（JSON）
+  dsh-purge-plus --diagnose    锚点漂移诊断（JSON）
+  dsh-purge-plus --probe       生成运行时注入探针
+  dsh-purge-plus --backup      创建插件/Profile 快照
+  dsh-purge-plus --rollback ID 从快照恢复插件文件（不自动重启）
+  dsh-purge-plus --usage       查看快照占用
+  dsh-purge-plus --prune       清理旧快照
+  dsh-purge-plus --refusal-retry on|off  模型推脱时单次重试
+  dsh-purge-plus --help        帮助`);
     return;
   }
 
   const state = await core.gatherState();
+
+  if (mode === "--host-status") {
+    console.log(JSON.stringify({
+      surface: state.surface,
+      ai_base: state.ai_base,
+      desktop_install: state.desktop_install || "",
+      desktop_exe: state.desktop_exe || "",
+      asar_still_sealed: Boolean(state.asar_still_sealed),
+      shim_dir: state.shim_dir || "",
+      patches_applied: state.patches_applied,
+      patches_pending: state.patches_pending,
+      patches_total: state.patches_total,
+    }, null, 2));
+    return;
+  }
+  if (mode === "--selfcheck") {
+    const report = await selfcheck.selfCheck(state.ai_base, state.dsh_home, { surface: state.surface, state });
+    console.log(JSON.stringify(report, null, 2));
+    process.exitCode = report.state === "broken" ? 1 : 0;
+    return;
+  }
+  if (mode === "--diagnose") {
+    const drift = state.ai_base
+      ? await core.patchDrift(state.ai_base, core.ALL_PATCHES, { surface: state.surface, dshHome: state.dsh_home })
+      : { host: "", checked: 0, drifted: [], optionalDrift: [], chained: [], missing: [] };
+    console.log(JSON.stringify(drift, null, 2));
+    process.exitCode = drift.drifted.length ? 1 : 0;
+    return;
+  }
+  if (mode === "--probe") {
+    console.log(JSON.stringify(createProbe(state.dsh_home), null, 2));
+    return;
+  }
+  if (mode === "--backup") {
+    console.log(JSON.stringify(maintenance.snapshot({ home: state.dsh_home, reason: "manual" }), null, 2));
+    return;
+  }
+  if (mode === "--rollback") {
+    const id = args[args.indexOf("--rollback") + 1];
+    if (!id || id.startsWith("--")) {
+      console.error("用法: dsh-purge-plus --rollback <backup-id>");
+      process.exit(2);
+    }
+    console.log(JSON.stringify(maintenance.rollback(id, { home: state.dsh_home }), null, 2));
+    return;
+  }
+  if (mode === "--usage") {
+    console.log(JSON.stringify(maintenance.usage(state.dsh_home), null, 2));
+    return;
+  }
+  if (mode === "--prune") {
+    console.log(JSON.stringify(maintenance.prune({ home: state.dsh_home }), null, 2));
+    return;
+  }
+  if (mode === "--refusal-retry") {
+    const value = String(args[args.indexOf("--refusal-retry") + 1] || "").toLowerCase();
+    if (value !== "on" && value !== "off") {
+      console.error("用法: dsh-purge-plus --refusal-retry on|off");
+      process.exit(2);
+    }
+    console.log(JSON.stringify(writeTuning({ refusalRetry: value === "on" }, state.dsh_home), null, 2));
+    return;
+  }
+
   console.log(printStatus(state));
   console.log("");
 
@@ -142,6 +219,6 @@ async function main() {
 }
 
 main().catch((e) => {
-  console.error("[dsh-purge] error:", e);
+  console.error("[dsh-purge-plus] error:", e);
   process.exit(1);
 });
